@@ -20,13 +20,61 @@ const { NotImplementedError } = require('../extensions/index.js');
  * 
  */
 class VigenereCipheringMachine {
-  encrypt() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+  constructor(machineModification = true) {
+    this.machineModification = machineModification;
+    this.latinAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   }
-  decrypt() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+
+  encrypt(message, key) {
+    if (!message || !key) throw new Error('Incorrect arguments!');
+
+    // Write a message and key in capital letters
+    const modificationMessage = message.toUpperCase();
+    const modificationKey = key.toUpperCase();
+    
+    let keyIndex = 0;
+    let result = [];
+
+    // Encrypt formula
+    // с = (m + k) % n
+    // m - ASCII codes of message letter,
+    // k - ASCII codes of key letter,
+    // n - number of letters in the dictionary
+
+    for (let character of modificationMessage) {
+      if (this.latinAlphabet.includes(character)) {
+        result.push(this.latinAlphabet.charAt((character.charCodeAt(0) + modificationKey.charCodeAt(keyIndex)) % this.latinAlphabet.length));
+        keyIndex == modificationKey.length - 1 ? keyIndex = 0 : keyIndex++;
+      } else {
+        result.push(character);
+      }
+    }
+    
+    return this.machineModification ? result.join('') : result.reverse().join('');
+  }
+  decrypt(encryptedMessage, key) {
+    if (!encryptedMessage || !key) throw new Error('Incorrect arguments!');
+
+    let modificationKey = key.toUpperCase();
+    let keyIndex = 0;
+    let result = [];
+
+    // Decrypt formula
+    // m = (c + n - k) % n
+    // c - ASCII codes of encrypted message letter,
+    // k - ASCII codes of key letter,
+    // n - number of letters in the dictionary
+
+    for (let character of encryptedMessage) {
+      if (this.latinAlphabet.indexOf(character) != -1) {
+        result.push(this.latinAlphabet.charAt((character.charCodeAt(0) + this.latinAlphabet.length - modificationKey.charCodeAt(keyIndex)) % this.latinAlphabet.length));
+        keyIndex == modificationKey.length - 1 ? keyIndex = 0 : keyIndex++;
+      } else {
+        result.push(character);
+      }
+    }
+
+    return this.machineModification ? result.join('') : result.reverse().join('');
   }
 }
 
